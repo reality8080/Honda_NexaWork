@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import os
+import sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from copy import deepcopy
