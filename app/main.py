@@ -10,88 +10,89 @@ import pandas as pd
 
 from nexaworks import MODEL_CONFIG, explain_decisions, load_dataset, run_pipeline, save_plan, save_scenario, sales_option_analysis
 from nexaworks.scenario.patch import apply_patch
+from nexaworks.i18n import LANG, localize_dataframe, t
 
 BASE = Path(__file__).resolve().parents[1]
 DATA_PATH = BASE / "data" / "candidate_dataset.json"
 
-LANG = {
-    "English": {
-        "title": "NexaWorks Operations Decision Support Tool",
-        "upload": "Dataset (candidate_dataset.json)",
-        "load": "Load dataset",
-        "strict": "Strict cash constraint",
-        "time": "Solver time limit (s)",
-        "run": "Run optimization",
-        "restore": "Restore initial scenario",
-        "status": "Status",
-        "decision": "Decision",
-        "assignment": "Assignment",
-        "sales": "Commercial options",
-        "explain": "Decision explanation",
-        "warnings": "Warnings / validation / infeasibility diagnostics",
-        "patch": "Scenario patch (JSON)",
-        "apply": "Apply patch",
-        "save": "Save scenario + plan",
-        "language": "Language",
-        "loaded": "Dataset loaded.",
-        "restored": "Scenario restored to the initial dataset.",
-        "patched": "Scenario updated. Run optimization again.",
-        "need_load": "Load or upload a dataset first.",
-        "saved": "Saved to",
-    },
-    "Tiếng Việt": {
-        "title": "Công cụ hỗ trợ quyết định vận hành NexaWorks",
-        "upload": "Dữ liệu (candidate_dataset.json)",
-        "load": "Nạp dữ liệu",
-        "strict": "Ràng buộc tiền mặt cứng",
-        "time": "Giới hạn thời gian solver (giây)",
-        "run": "Chạy tối ưu hóa",
-        "restore": "Khôi phục scenario ban đầu",
-        "status": "Trạng thái",
-        "decision": "Quyết định",
-        "assignment": "Phân công",
-        "sales": "Phương án thương mại",
-        "explain": "Giải thích quyết định",
-        "warnings": "Cảnh báo / validation / chẩn đoán infeasibility",
-        "patch": "Scenario patch (JSON)",
-        "apply": "Áp dụng patch",
-        "save": "Lưu scenario + plan",
-        "language": "Ngôn ngữ",
-        "loaded": "Đã nạp dữ liệu.",
-        "restored": "Đã khôi phục scenario ban đầu.",
-        "patched": "Scenario đã thay đổi. Hãy chạy tối ưu hóa lại.",
-        "need_load": "Hãy nạp hoặc upload dataset trước.",
-        "saved": "Đã lưu tại",
-    },
-    "日本語": {
-        "title": "NexaWorks 運用意思決定支援ツール",
-        "upload": "データセット (candidate_dataset.json)",
-        "load": "データを読み込む",
-        "strict": "厳格なキャッシュ制約",
-        "time": "ソルバー制限時間 (秒)",
-        "run": "最適化を実行",
-        "restore": "初期シナリオに戻す",
-        "status": "ステータス",
-        "decision": "意思決定",
-        "assignment": "担当割当",
-        "sales": "商用オプション",
-        "explain": "意思決定の説明",
-        "warnings": "警告 / 検証 / infeasibility 診断",
-        "patch": "Scenario patch (JSON)",
-        "apply": "Patch を適用",
-        "save": "Scenario + plan を保存",
-        "language": "言語",
-        "loaded": "データセットを読み込みました。",
-        "restored": "初期シナリオに戻しました。",
-        "patched": "シナリオを更新しました。もう一度最適化を実行してください。",
-        "need_load": "先にデータセットを読み込むかアップロードしてください。",
-        "saved": "保存先",
-    },
-}
+# LANG = {
+#     "English": {
+#         "title": "NexaWorks Operations Decision Support Tool",
+#         "upload": "Dataset (candidate_dataset.json)",
+#         "load": "Load dataset",
+#         "strict": "Strict cash constraint",
+#         "time": "Solver time limit (s)",
+#         "run": "Run optimization",
+#         "restore": "Restore initial scenario",
+#         "status": "Status",
+#         "decision": "Decision",
+#         "assignment": "Assignment",
+#         "sales": "Commercial options",
+#         "explain": "Decision explanation",
+#         "warnings": "Warnings / validation / infeasibility diagnostics",
+#         "patch": "Scenario patch (JSON)",
+#         "apply": "Apply patch",
+#         "save": "Save scenario + plan",
+#         "language": "Language",
+#         "loaded": "Dataset loaded.",
+#         "restored": "Scenario restored to the initial dataset.",
+#         "patched": "Scenario updated. Run optimization again.",
+#         "need_load": "Load or upload a dataset first.",
+#         "saved": "Saved to",
+#     },
+#     "Tiếng Việt": {
+#         "title": "Công cụ hỗ trợ quyết định vận hành NexaWorks",
+#         "upload": "Dữ liệu (candidate_dataset.json)",
+#         "load": "Nạp dữ liệu",
+#         "strict": "Ràng buộc tiền mặt cứng",
+#         "time": "Giới hạn thời gian solver (giây)",
+#         "run": "Chạy tối ưu hóa",
+#         "restore": "Khôi phục scenario ban đầu",
+#         "status": "Trạng thái",
+#         "decision": "Quyết định",
+#         "assignment": "Phân công",
+#         "sales": "Phương án thương mại",
+#         "explain": "Giải thích quyết định",
+#         "warnings": "Cảnh báo / validation / chẩn đoán infeasibility",
+#         "patch": "Scenario patch (JSON)",
+#         "apply": "Áp dụng patch",
+#         "save": "Lưu scenario + plan",
+#         "language": "Ngôn ngữ",
+#         "loaded": "Đã nạp dữ liệu.",
+#         "restored": "Đã khôi phục scenario ban đầu.",
+#         "patched": "Scenario đã thay đổi. Hãy chạy tối ưu hóa lại.",
+#         "need_load": "Hãy nạp hoặc upload dataset trước.",
+#         "saved": "Đã lưu tại",
+#     },
+#     "日本語": {
+#         "title": "NexaWorks 運用意思決定支援ツール",
+#         "upload": "データセット (candidate_dataset.json)",
+#         "load": "データを読み込む",
+#         "strict": "厳格なキャッシュ制約",
+#         "time": "ソルバー制限時間 (秒)",
+#         "run": "最適化を実行",
+#         "restore": "初期シナリオに戻す",
+#         "status": "ステータス",
+#         "decision": "意思決定",
+#         "assignment": "担当割当",
+#         "sales": "商用オプション",
+#         "explain": "意思決定の説明",
+#         "warnings": "警告 / 検証 / infeasibility 診断",
+#         "patch": "Scenario patch (JSON)",
+#         "apply": "Patch を適用",
+#         "save": "Scenario + plan を保存",
+#         "language": "言語",
+#         "loaded": "データセットを読み込みました。",
+#         "restored": "初期シナリオに戻しました。",
+#         "patched": "シナリオを更新しました。もう一度最適化を実行してください。",
+#         "need_load": "先にデータセットを読み込むかアップロードしてください。",
+#         "saved": "保存先",
+#     },
+# }
 
 
-def t(language, key):
-    return LANG.get(language, LANG["English"]).get(key, LANG["English"].get(key, key))
+# def t(language, key):
+#     return LANG.get(language, LANG["English"]).get(key, LANG["English"].get(key, key))
 
 
 def load_action(file_path, language):
@@ -116,7 +117,7 @@ def run_action(raw, strict_cash, time_limit, language):
             f"Diagnostics: {len(outcome['post_check']) if outcome['post_check'] is not None else 0}"
         )
         explanation = (
-            explain_decisions(result, outcome.get("data_model"), cfg, outcome.get("validation"), outcome.get("post_check"))
+            explain_decisions(result, outcome.get("data_model"), cfg, outcome.get("validation"), outcome.get("post_check"), language=language)
             if outcome.get("data_model") is not None else pd.DataFrame()
         )
         if outcome.get("data_model") is not None:
@@ -127,10 +128,17 @@ def run_action(raw, strict_cash, time_limit, language):
         else:
             sales = pd.DataFrame()
         warnings = outcome.get("post_check", pd.DataFrame())
-        return outcome, status, result.get("decision", pd.DataFrame()), result.get("assignment", pd.DataFrame()), sales, explanation, warnings
+
+        # Áp dụng dịch DataFrame trước khi hiển thị lên giao diện
+        decision_df = localize_dataframe(result.get("decision", pd.DataFrame()), language)
+        assignment_df = localize_dataframe(result.get("assignment", pd.DataFrame()), language)
+        sales_df = localize_dataframe(sales, language)
+        explanation_df = localize_dataframe(explanation, language)
+        warnings_df = localize_dataframe(warnings, language)
+
+        return outcome, status, decision_df, assignment_df, sales_df, explanation_df, warnings_df
     except Exception as exc:
         return {"error": str(exc)}, f"Run error: {exc}", *([pd.DataFrame()] * 5)
-
 
 def patch_action(raw, patch_text, language):
     if raw is None:
@@ -159,8 +167,48 @@ def save_action(raw, outcome, language):
     return f"{t(language, 'saved')}: {out.resolve()}"
 
 
-def language_updates(language):
-    # Core labels are switched; dynamic solver diagnostics stay machine-generated.
+def language_updates(language, raw, outcome):
+    # Khởi tạo các DataFrame rỗng mặc định
+    decision_df = pd.DataFrame()
+    assignment_df = pd.DataFrame()
+    sales_df = pd.DataFrame()
+    explanation_df = pd.DataFrame()
+    warnings_df = pd.DataFrame()
+
+    # Nếu đã có kết quả tối ưu hóa (outcome), tạo lại dữ liệu bảng và bản địa hóa (localize)
+    if outcome and isinstance(outcome, dict) and outcome.get("result") is not None:
+        result = outcome["result"]
+        dm = outcome.get("data_model")
+        cfg = deepcopy(MODEL_CONFIG)
+
+        raw_decision = result.get("decision", pd.DataFrame())
+        raw_assignment = result.get("assignment", pd.DataFrame())
+
+        if dm is not None:
+            explanation = explain_decisions(
+                result, dm, cfg, outcome.get("validation"), outcome.get("post_check"), language=language
+            )
+            if raw is not None and "metadata" in raw:
+                start = pd.Timestamp(raw["metadata"]["planning_start"])
+                end = pd.Timestamp(raw["metadata"]["planning_end"])
+                planning_days = (end - start).days + 1
+                sales = sales_option_analysis(dm, result, planning_days, cfg)
+            else:
+                sales = pd.DataFrame()
+        else:
+            explanation = pd.DataFrame()
+            sales = pd.DataFrame()
+
+        warnings = outcome.get("post_check", pd.DataFrame())
+
+        # Dịch tiêu đề cột và giá trị hiển thị trong các DataFrame
+        decision_df = localize_dataframe(raw_decision, language)
+        assignment_df = localize_dataframe(raw_assignment, language)
+        sales_df = localize_dataframe(sales, language)
+        explanation_df = localize_dataframe(explanation, language)
+        warnings_df = localize_dataframe(warnings, language)
+
+    # Cập nhật giao diện (Label/Button/Header) đồng thời cập nhật lại giá trị bảng (Dataframe)
     return (
         gr.update(label=t(language, "upload")),
         gr.update(value=t(language, "load")),
@@ -169,11 +217,12 @@ def language_updates(language):
         gr.update(value=t(language, "run")),
         gr.update(value=t(language, "restore")),
         gr.update(label=t(language, "status")),
-        gr.update(label=t(language, "decision")),
-        gr.update(label=t(language, "assignment")),
-        gr.update(label=t(language, "sales")),
-        gr.update(label=t(language, "explain")),
-        gr.update(label=t(language, "warnings")),
+        gr.update(label=t(language, "status")),
+        gr.update(label=t(language, "decision"), value=decision_df),
+        gr.update(label=t(language, "assignment"), value=assignment_df),
+        gr.update(label=t(language, "sales"), value=sales_df),
+        gr.update(label=t(language, "explain"), value=explanation_df),
+        gr.update(label=t(language, "warnings"), value=warnings_df),
         gr.update(label=t(language, "patch")),
         gr.update(value=t(language, "apply")),
         gr.update(value=t(language, "save")),
@@ -228,8 +277,26 @@ with gr.Blocks(title="NexaWorks Operations Decision Support Tool") as demo:
     save_btn.click(save_action, [raw_state, outcome_state, language], [save_status])
     language.change(
         language_updates,
-        [language],
-        [upload, load_btn, strict, limit, run_btn, restore_btn, load_status, decision, assignment, sales, explanation, warnings, patch, patch_btn, save_btn, header],
+        inputs=[language, raw_state, outcome_state],
+        outputs=[
+            upload,
+            load_btn,
+            strict,
+            limit,
+            run_btn,
+            restore_btn,
+            load_status,
+            status,
+            decision,
+            assignment,
+            sales,
+            explanation,
+            warnings,
+            patch,
+            patch_btn,
+            save_btn,
+            header,
+        ],
     )
 
 
