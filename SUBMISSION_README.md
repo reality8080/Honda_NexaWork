@@ -2,12 +2,12 @@
 
 ## 1. Candidate and submission
 
-- Candidate name: **[fill before submission]**
-- Application URL: **[paste Hugging Face Space URL]**
-- Source repository or archive: **[paste repository or final ZIP]**
+- Candidate name: **Nguyen Tran Thien Phu**
+- Application URL: **[Honda NexaWork](https://honda-nexawork.onrender.com)**
+- Source repository or archive: **[Honda NexaWork](https://github.com/reality8080/Honda_NexaWork)**
 - Evaluation login, if required: **Not required**
-- Tested browser / operating system: **[fill after final clean-environment test]**
-- Commit or release identifier: **[fill after final Git commit/tag]**
+- Tested browser / operating system: **Not required**
+- Commit or release identifier: **Not required**
 
 ## 2. Problem interpretation / 課題の理解
 
