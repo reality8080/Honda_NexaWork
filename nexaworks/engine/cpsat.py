@@ -308,7 +308,7 @@ class NexaWorksEngine:
                 "work_id": w,
                 "title": wr.get("title_canonical", wr.get("title")),
                 "title_en": wr.get("title_en", wr.get("title_canonical")),
-                "title_vi": wr.get("title_vi", wr.get("title_canonical")),
+                "title_vn": wr.get("title_vn", wr.get("title_vi", wr.get("title_canonical"))),
                 "title_ja": wr.get("title_ja", wr.get("title_canonical")),
                 "decision": decision,
                 "selected": selected,

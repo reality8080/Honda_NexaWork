@@ -3,6 +3,12 @@ LANG_CODE = {
     "Tiếng Việt": "vi",
     "日本語": "ja",
 }
+# Hậu tố cột lưu/hiển thị (vi trong dataset → _vn)
+COL_SUFFIX = {
+    "English": "en",
+    "Tiếng Việt": "vn",
+    "日本語": "ja",
+}
 
 TRANSLATIONS = {
     "English": {
@@ -285,7 +291,7 @@ COLUMN_TRANSLATIONS = {
 }
 
 
-# Cột nội dung đa ngôn ngữ: ưu tiên lấy *_vi / *_en / *_ja theo UI
+# Cột nội dung đa ngôn ngữ: chuẩn _en / _vn / _ja
 MULTILINGUAL_CONTENT_COLS = ("title", "label", "notes", "reason", "message")
 
 
@@ -298,13 +304,27 @@ def t(language, key, **kwargs):
 
 
 def _pick_lang_col(df, base_col, language):
-    """Chọn cột base_col_<code> theo ngôn ngữ UI; fallback en rồi canonical."""
-    code = LANG_CODE.get(language, "en")
-    for suffix in (code, "en", "canonical"):
-        col = f"{base_col}_{suffix}"
+    """Chọn cột base_col_<suffix> theo ngôn ngữ UI. Chuẩn: _en/_vn/_ja (đọc cả _vi legacy)."""
+    suffix = COL_SUFFIX.get(language, "en")
+    if suffix == "vn":
+        candidates = ["vn", "vi", "en", "canonical"]
+    else:
+        candidates = [suffix, "en", "canonical"]
+    for s in candidates:
+        col = f"{base_col}_{s}"
         if col in df.columns:
             return col
     return base_col if base_col in df.columns else None
+
+
+def _resolve_ml_value(value, language):
+    """Nếu value là dict {en,vi,ja} thì lấy đúng ngôn ngữ UI."""
+    if isinstance(value, dict):
+        code = LANG_CODE.get(language, "en")
+        if code == "vi":
+            return value.get("vi") or value.get("vn") or value.get("en") or next(iter(value.values()), None)
+        return value.get(code) or value.get("en") or next(iter(value.values()), None)
+    return value
 
 
 def localize_dataframe(df, language):
@@ -316,8 +336,10 @@ def localize_dataframe(df, language):
     # 1) Thay nội dung title/label/... bằng bản dịch đúng ngôn ngữ
     for base in MULTILINGUAL_CONTENT_COLS:
         src = _pick_lang_col(result, base, language)
-        if src and src != base and src in result.columns:
+        if src and src in result.columns:
             result[base] = result[src]
+        elif base in result.columns:
+            result[base] = result[base].map(lambda x: _resolve_ml_value(x, language))
         # Ẩn các cột phụ _en/_vi/_ja/_canonical khi hiển thị
         drop_cols = [
             c for c in result.columns
@@ -330,11 +352,13 @@ def localize_dataframe(df, language):
     mapping = COLUMN_TRANSLATIONS.get(language, COLUMN_TRANSLATIONS["English"])
     result = result.rename(columns={c: mapping.get(c, c) for c in result.columns})
 
-    # 3) Dịch giá trị boolean / decision / status
+    # 3) Dịch giá trị boolean / decision / status (+ dict còn sót)
     for col in result.columns:
         dtype_name = getattr(result[col].dtype, "name", str(result[col].dtype))
         if dtype_name in ("object", "string", "str", "bool", "boolean") or result[col].dtype == object:
-            result[col] = result[col].map(lambda x: localize_value(x, language))
+            result[col] = result[col].map(
+                lambda x: localize_value(_resolve_ml_value(x, language), language)
+            )
 
     return result
 

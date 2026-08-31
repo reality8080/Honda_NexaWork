@@ -12,6 +12,10 @@ def canonical(value, language: str = "en"):
     return value.get(language, value.get("en", next(iter(value.values()), None)))
 
 
+# Dataset dùng key "vi"; cột nội bộ/lưu file chuẩn hóa thành "_vn"
+_LANG_COL = {"en": "en", "vi": "vn", "vn": "vn", "ja": "ja"}
+
+
 def records_to_df(records: Iterable[dict], multilingual_fields=(), canonical_language: str = "en") -> pd.DataFrame:
     rows = []
     for rec in records:
@@ -20,7 +24,8 @@ def records_to_df(records: Iterable[dict], multilingual_fields=(), canonical_lan
             value = rec.get(field)
             if isinstance(value, dict):
                 for lang, text in value.items():
-                    row[f"{field}_{lang}"] = text
+                    suffix = _LANG_COL.get(lang, lang)
+                    row[f"{field}_{suffix}"] = text
                 row[f"{field}_canonical"] = canonical(value, canonical_language)
         rows.append(row)
     return pd.DataFrame(rows)
