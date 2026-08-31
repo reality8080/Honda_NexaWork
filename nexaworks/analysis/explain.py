@@ -60,3 +60,15 @@ def explain_decisions(result, dm, config, validation=None, post_check=None, lang
             "warnings": "; ".join(warns)
         })
     return pd.DataFrame(rows)
+
+def check_cash_flow(current_cash, min_buffer):
+    if current_cash < min_buffer:
+        return {
+            "code": "CASH_SHORTFALL",
+            "status": {"vi": "Cảnh báo", "ja": "警告", "en": "WARNING"},
+            "message": {
+                "vi": f"Tiền mặt dự kiến ({current_cash:,}) < Mức dự phòng ({min_buffer:,})",
+                "ja": f"予想現金 ({current_cash:,}) < バッファ ({min_buffer:,})",
+                "en": f"Expected cash {current_cash:,} < buffer {min_buffer:,}"
+            }
+        }

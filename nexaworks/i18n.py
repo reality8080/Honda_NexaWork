@@ -173,6 +173,14 @@ COLUMN_TRANSLATIONS = {
     },
 
     "Tiếng Việt": {
+        "execute": "Thực hiện",
+        "delay": "Trì hoãn",
+        "decline": "Từ chối",
+        "true": "Có",
+        "false": "Không",
+        "CASH_SHORTFALL": "Thiếu hụt tiền mặt",
+        "Expected cash {cash} < buffer {buffer}": "Tiền mặt dự kiến {cash} < Mức dự phòng {buffer}",
+
         "work_id": "Mã công việc",
         "selected": "Đã chọn",
         "decision": "Quyết định",
@@ -208,6 +216,12 @@ COLUMN_TRANSLATIONS = {
     },
 
     "日本語": {
+        "execute": "実行",
+        "delay": "保留",
+        "decline": "見送り",
+        "true": "はい",
+        "false": "いいえ",
+
         "work_id": "作業ID",
         "selected": "選択済み",
         "decision": "意思決定",
