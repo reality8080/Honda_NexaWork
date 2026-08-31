@@ -1,7 +1,7 @@
 from __future__ import annotations
 import pandas as pd
 from nexaworks.engine.financials import work_financials
-from i18n import t
+from nexaworks.i18n import t
 
 def explain_decisions(result, dm, config, validation=None, post_check=None, language="English"):
     if result.get("decision", pd.DataFrame()).empty:

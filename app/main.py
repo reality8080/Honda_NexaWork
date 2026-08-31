@@ -8,91 +8,13 @@ from pathlib import Path
 import gradio as gr
 import pandas as pd
 
-from nexaworks import MODEL_CONFIG, explain_decisions, load_dataset, run_pipeline, save_plan, save_scenario, sales_option_analysis
-from nexaworks.scenario.patch import apply_patch
-from nexaworks.i18n import LANG, localize_dataframe, t
-
 BASE = Path(__file__).resolve().parents[1]
 DATA_PATH = BASE / "data" / "candidate_dataset.json"
 
-# LANG = {
-#     "English": {
-#         "title": "NexaWorks Operations Decision Support Tool",
-#         "upload": "Dataset (candidate_dataset.json)",
-#         "load": "Load dataset",
-#         "strict": "Strict cash constraint",
-#         "time": "Solver time limit (s)",
-#         "run": "Run optimization",
-#         "restore": "Restore initial scenario",
-#         "status": "Status",
-#         "decision": "Decision",
-#         "assignment": "Assignment",
-#         "sales": "Commercial options",
-#         "explain": "Decision explanation",
-#         "warnings": "Warnings / validation / infeasibility diagnostics",
-#         "patch": "Scenario patch (JSON)",
-#         "apply": "Apply patch",
-#         "save": "Save scenario + plan",
-#         "language": "Language",
-#         "loaded": "Dataset loaded.",
-#         "restored": "Scenario restored to the initial dataset.",
-#         "patched": "Scenario updated. Run optimization again.",
-#         "need_load": "Load or upload a dataset first.",
-#         "saved": "Saved to",
-#     },
-#     "Tiếng Việt": {
-#         "title": "Công cụ hỗ trợ quyết định vận hành NexaWorks",
-#         "upload": "Dữ liệu (candidate_dataset.json)",
-#         "load": "Nạp dữ liệu",
-#         "strict": "Ràng buộc tiền mặt cứng",
-#         "time": "Giới hạn thời gian solver (giây)",
-#         "run": "Chạy tối ưu hóa",
-#         "restore": "Khôi phục scenario ban đầu",
-#         "status": "Trạng thái",
-#         "decision": "Quyết định",
-#         "assignment": "Phân công",
-#         "sales": "Phương án thương mại",
-#         "explain": "Giải thích quyết định",
-#         "warnings": "Cảnh báo / validation / chẩn đoán infeasibility",
-#         "patch": "Scenario patch (JSON)",
-#         "apply": "Áp dụng patch",
-#         "save": "Lưu scenario + plan",
-#         "language": "Ngôn ngữ",
-#         "loaded": "Đã nạp dữ liệu.",
-#         "restored": "Đã khôi phục scenario ban đầu.",
-#         "patched": "Scenario đã thay đổi. Hãy chạy tối ưu hóa lại.",
-#         "need_load": "Hãy nạp hoặc upload dataset trước.",
-#         "saved": "Đã lưu tại",
-#     },
-#     "日本語": {
-#         "title": "NexaWorks 運用意思決定支援ツール",
-#         "upload": "データセット (candidate_dataset.json)",
-#         "load": "データを読み込む",
-#         "strict": "厳格なキャッシュ制約",
-#         "time": "ソルバー制限時間 (秒)",
-#         "run": "最適化を実行",
-#         "restore": "初期シナリオに戻す",
-#         "status": "ステータス",
-#         "decision": "意思決定",
-#         "assignment": "担当割当",
-#         "sales": "商用オプション",
-#         "explain": "意思決定の説明",
-#         "warnings": "警告 / 検証 / infeasibility 診断",
-#         "patch": "Scenario patch (JSON)",
-#         "apply": "Patch を適用",
-#         "save": "Scenario + plan を保存",
-#         "language": "言語",
-#         "loaded": "データセットを読み込みました。",
-#         "restored": "初期シナリオに戻しました。",
-#         "patched": "シナリオを更新しました。もう一度最適化を実行してください。",
-#         "need_load": "先にデータセットを読み込むかアップロードしてください。",
-#         "saved": "保存先",
-#     },
-# }
 
-
-# def t(language, key):
-#     return LANG.get(language, LANG["English"]).get(key, LANG["English"].get(key, key))
+from nexaworks import MODEL_CONFIG, explain_decisions, load_dataset, run_pipeline, save_plan, save_scenario, sales_option_analysis
+from nexaworks.scenario.patch import apply_patch
+from nexaworks.i18n import localize_dataframe, t, TRANSLATIONS
 
 
 def load_action(file_path, language):
@@ -236,7 +158,7 @@ with gr.Blocks(title="NexaWorks Operations Decision Support Tool") as demo:
     outcome_state = gr.State(None)
 
     header = gr.Markdown(f"# {t('English', 'title')}")
-    language = gr.Dropdown(list(LANG.keys()), value="English", label="Language", scale=1)
+    language = gr.Dropdown(list(TRANSLATIONS.keys()), value="English", label="Language", scale=1)
     with gr.Row():
         upload = gr.File(label=t("English", "upload"), file_types=[".json"], type="filepath", scale=3)
         load_btn = gr.Button(t("English", "load"), scale=1)
