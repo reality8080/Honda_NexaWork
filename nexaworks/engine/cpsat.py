@@ -303,14 +303,18 @@ class NexaWorksEngine:
             selected = s.Value(self.select[w]) == 1
             delay = s.Value(self.delay[w])
             decision = "decline" if not selected else ("delay" if delay > 0 else "execute")
+            wr = self.work_row[w]
             drows.append({
                 "work_id": w,
-                "title": self.work_row[w]["title_canonical"],
+                "title": wr.get("title_canonical", wr.get("title")),
+                "title_en": wr.get("title_en", wr.get("title_canonical")),
+                "title_vi": wr.get("title_vi", wr.get("title_canonical")),
+                "title_ja": wr.get("title_ja", wr.get("title_canonical")),
                 "decision": decision,
                 "selected": selected,
-                "mandatory": bool(self.work_row[w]["mandatory"]),
-                "committed": bool(self.work_row[w]["committed"]),
-                "base_hours": int(self.work_row[w]["required_hours"]),
+                "mandatory": bool(wr["mandatory"]),
+                "committed": bool(wr["committed"]),
+                "base_hours": int(wr["required_hours"]),
                 "effective_hours": s.Value(self.effective_hours[w]),
                 "start_hour": s.Value(self.ws[w]),
                 "end_hour": s.Value(self.we[w]),

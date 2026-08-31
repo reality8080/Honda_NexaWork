@@ -1,3 +1,9 @@
+LANG_CODE = {
+    "English": "en",
+    "Tiếng Việt": "vi",
+    "日本語": "ja",
+}
+
 TRANSLATIONS = {
     "English": {
         "title": "NexaWorks Operations Decision Support Tool",
@@ -17,6 +23,11 @@ TRANSLATIONS = {
         "apply": "Apply patch",
         "save": "Save scenario + plan",
         "language": "Language",
+        "loaded": "Loaded",
+        "need_load": "Please load dataset first",
+        "patched": "Patch applied",
+        "restored": "Restored initial scenario",
+        "saved": "Saved",
 
         "selected_by_objective": "Selected by objective under current constraints",
         "not_selected": "Not selected under current objective/constraints",
@@ -62,6 +73,11 @@ TRANSLATIONS = {
         "apply": "Áp dụng thay đổi",
         "save": "Lưu kịch bản + kế hoạch",
         "language": "Ngôn ngữ",
+        "loaded": "Đã nạp",
+        "need_load": "Vui lòng nạp dữ liệu trước",
+        "patched": "Đã áp dụng thay đổi",
+        "restored": "Đã khôi phục kịch bản ban đầu",
+        "saved": "Đã lưu",
 
         "selected_by_objective": "Được chọn theo hàm mục tiêu và các ràng buộc hiện tại",
         "not_selected": "Không được chọn theo hàm mục tiêu và các ràng buộc hiện tại",
@@ -107,6 +123,11 @@ TRANSLATIONS = {
         "apply": "変更を適用",
         "save": "シナリオ + 計画を保存",
         "language": "言語",
+        "loaded": "読み込み完了",
+        "need_load": "先にデータを読み込んでください",
+        "patched": "変更を適用しました",
+        "restored": "初期シナリオに戻しました",
+        "saved": "保存しました",
 
         "selected_by_objective": "現在の目的関数と制約に基づいて選択",
         "not_selected": "現在の目的関数と制約により選択されていません",
@@ -139,6 +160,7 @@ TRANSLATIONS = {
 COLUMN_TRANSLATIONS = {
     "English": {
         "work_id": "Work ID",
+        "title": "Title",
         "selected": "Selected",
         "decision": "Decision",
         "person_id": "Person ID",
@@ -170,6 +192,9 @@ COLUMN_TRANSLATIONS = {
         "record_id": "Record ID",
         "field": "Field",
         "message": "Message",
+        "execute": "Execute",
+        "delay": "Delay",
+        "decline": "Decline",
     },
 
     "Tiếng Việt": {
@@ -182,6 +207,7 @@ COLUMN_TRANSLATIONS = {
         "Expected cash {cash} < buffer {buffer}": "Tiền mặt dự kiến {cash} < Mức dự phòng {buffer}",
 
         "work_id": "Mã công việc",
+        "title": "Tiêu đề",
         "selected": "Đã chọn",
         "decision": "Quyết định",
         "person_id": "Mã nhân sự",
@@ -223,6 +249,7 @@ COLUMN_TRANSLATIONS = {
         "false": "いいえ",
 
         "work_id": "作業ID",
+        "title": "タイトル",
         "selected": "選択済み",
         "decision": "意思決定",
         "person_id": "担当者ID",
@@ -258,6 +285,10 @@ COLUMN_TRANSLATIONS = {
 }
 
 
+# Cột nội dung đa ngôn ngữ: ưu tiên lấy *_vi / *_en / *_ja theo UI
+MULTILINGUAL_CONTENT_COLS = ("title", "label", "notes", "reason", "message")
+
+
 def t(language, key, **kwargs):
     text = TRANSLATIONS.get(language, TRANSLATIONS["English"]).get(
         key,
@@ -266,33 +297,55 @@ def t(language, key, **kwargs):
     return text.format(**kwargs)
 
 
+def _pick_lang_col(df, base_col, language):
+    """Chọn cột base_col_<code> theo ngôn ngữ UI; fallback en rồi canonical."""
+    code = LANG_CODE.get(language, "en")
+    for suffix in (code, "en", "canonical"):
+        col = f"{base_col}_{suffix}"
+        if col in df.columns:
+            return col
+    return base_col if base_col in df.columns else None
+
+
 def localize_dataframe(df, language):
     if df is None:
         return df
 
     result = df.copy()
 
-    # Column names
-    mapping = COLUMN_TRANSLATIONS.get(
-        language, COLUMN_TRANSLATIONS["English"]
-    )
-    result = result.rename(
-        columns={c: mapping.get(c, c) for c in result.columns}
-    )
+    # 1) Thay nội dung title/label/... bằng bản dịch đúng ngôn ngữ
+    for base in MULTILINGUAL_CONTENT_COLS:
+        src = _pick_lang_col(result, base, language)
+        if src and src != base and src in result.columns:
+            result[base] = result[src]
+        # Ẩn các cột phụ _en/_vi/_ja/_canonical khi hiển thị
+        drop_cols = [
+            c for c in result.columns
+            if c.startswith(f"{base}_") and c != base
+        ]
+        if drop_cols:
+            result = result.drop(columns=drop_cols, errors="ignore")
 
-    # Common status / boolean values
+    # 2) Dịch tên cột
+    mapping = COLUMN_TRANSLATIONS.get(language, COLUMN_TRANSLATIONS["English"])
+    result = result.rename(columns={c: mapping.get(c, c) for c in result.columns})
+
+    # 3) Dịch giá trị boolean / decision / status
     for col in result.columns:
-        if result[col].dtype == object:
-            result[col] = result[col].map(
-                lambda x: localize_value(x, language)
-            )
+        dtype_name = getattr(result[col].dtype, "name", str(result[col].dtype))
+        if dtype_name in ("object", "string", "str", "bool", "boolean") or result[col].dtype == object:
+            result[col] = result[col].map(lambda x: localize_value(x, language))
 
     return result
 
 
 def localize_value(value, language):
-    if isinstance(value, bool):
-        return t(language, "true" if value else "false")
+    # bool / numpy.bool_
+    if isinstance(value, (bool, type(True))) or type(value).__name__ in ("bool_", "bool8"):
+        try:
+            return t(language, "true" if bool(value) else "false")
+        except Exception:
+            pass
 
     if value in {"Feasible", "Infeasible", "Warning", "Invalid Input"}:
         key = {
@@ -302,5 +355,9 @@ def localize_value(value, language):
             "Invalid Input": "invalid_input",
         }[value]
         return t(language, key)
+
+    if value in {"execute", "delay", "decline"}:
+        mapping = COLUMN_TRANSLATIONS.get(language, COLUMN_TRANSLATIONS["English"])
+        return mapping.get(value, value)
 
     return value
