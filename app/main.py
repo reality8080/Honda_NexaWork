@@ -151,6 +151,28 @@ def language_updates(language, raw, outcome):
         gr.update(value=f"# {t(language, 'title')}"),
     )
 
+def edit_data_action(raw, entity, action, item_id, payload, language):
+    if raw is None:
+        return raw, t(language, "need_load")
+    try:
+        data = json.loads(payload or "{}")
+        key_map = {"work_items": "work_items", "people": "people", "company": "company"}
+        k = key_map[entity]
+        if action == "add":
+            if k not in raw:
+                raw[k] = []
+            raw[k].append(data)
+        elif action == "edit":
+            items = raw.get(k, [])
+            for i, it in enumerate(items):
+                if str(it.get("id") or it.get("work_id") or it.get("person_id")) == str(item_id):
+                    items[i] = {**it, **data}
+                    break
+        elif action == "delete":
+            raw[k] = [it for it in raw.get(k, []) if str(it.get("id") or it.get("work_id") or it.get("person_id")) != str(item_id)]
+        return raw, t(language, "patched")
+    except Exception as exc:
+        return raw, f"Edit error: {exc}"
 
 with gr.Blocks(title="NexaWorks Operations Decision Support Tool") as demo:
     raw_state = gr.State(None)
@@ -172,6 +194,15 @@ with gr.Blocks(title="NexaWorks Operations Decision Support Tool") as demo:
 
     status = gr.Textbox(label=t("English", "status"))
 
+    with gr.Tab(t("English", "edit_data") if "edit_data" in TRANSLATIONS["English"] else "Edit Data"):
+        with gr.Row():
+            entity = gr.Dropdown(choices=["work_items", "people", "company"], value="work_items", label="Entity")
+            action = gr.Dropdown(choices=["add", "edit", "delete"], value="edit", label="Action")
+        item_id = gr.Textbox(label="ID (for edit/delete)")
+        payload = gr.Textbox(label="JSON payload (for add/edit)", lines=10, value="{}")
+        edit_btn = gr.Button(t("English", "apply_edit"))
+        edit_status = gr.Textbox()
+
     with gr.Tab(t("English", "decision")):
         decision = gr.Dataframe(label=t("English", "decision"), interactive=False)
         assignment = gr.Dataframe(label=t("English", "assignment"), interactive=False)
@@ -190,6 +221,11 @@ with gr.Blocks(title="NexaWorks Operations Decision Support Tool") as demo:
 
     load_btn.click(load_action, [upload, language], [raw_state, initial_state, load_status])
     restore_btn.click(restore_action, [initial_state, language], [raw_state, patch, patch_status])
+
+
+
+    edit_btn.click(edit_data_action, [raw_state, entity, action, item_id, payload, language], [raw_state, edit_status])
+
     patch_btn.click(patch_action, [raw_state, patch, language], [raw_state, patch_status])
     run_btn.click(
         run_action,

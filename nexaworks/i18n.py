@@ -59,6 +59,11 @@ TRANSLATIONS = {
         "cash_shortfall": "Cash shortfall",
         "no_skill_coverage": "No qualified skill coverage",
         "no_language_coverage": "No qualified language coverage",
+
+        "edit_data": "Edit Data",
+        "entity": "Entity",
+        "action": "Action",
+        "apply_edit": "Apply edit",
     },
 
     "Tiếng Việt": {
@@ -109,6 +114,11 @@ TRANSLATIONS = {
         "cash_shortfall": "Thiếu hụt tiền mặt",
         "no_skill_coverage": "Không có nhân sự đáp ứng kỹ năng",
         "no_language_coverage": "Không có nhân sự đáp ứng ngôn ngữ",
+
+        "edit_data": "Chỉnh sửa dữ liệu",
+        "entity": "Đối tượng",
+        "action": "Hành động",
+        "apply_edit": "Áp dụng chỉnh sửa",
     },
 
     "日本語": {
@@ -159,6 +169,11 @@ TRANSLATIONS = {
         "cash_shortfall": "キャッシュ不足",
         "no_skill_coverage": "必要なスキルを満たす担当者がいません",
         "no_language_coverage": "必要な言語を満たす担当者がいません",
+
+        "edit_data": "データを編集",
+        "entity": "対象",
+        "action": "操作",
+        "apply_edit": "編集を適用",
     },
 }
 

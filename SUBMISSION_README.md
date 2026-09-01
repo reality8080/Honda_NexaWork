@@ -165,14 +165,40 @@ Do not put confidential customer information into a public evaluation Space. No 
 
 The highest-value improvement would be a stronger infeasibility/sensitivity analysis: identify active blocking constraints more precisely, compare alternative feasible plans, and show which assumption changes most strongly affect selections, assignments, cash and deadlines.
 
-## 15. Screenshots and optional demo
+## 15. Screenshots
 
-Recommended evidence:
+Screenshots are located in `submit_screen/`:
 
-1. Decision screen — selected, declined and delayed work.
-2. Sales screen — commercial option comparison.
-3. Explain screen — reasons and warnings/diagnostics.
-4. Scenario screen — patch and restore flow.
-5. Strict-cash case — changed plan or infeasibility diagnostics.
+| File | Content |
+|------|---------|
+| `01_decision_baseline.png` | Main decision screen (baseline OPTIMAL, Objective 29819990.0) |
+| `02_sales_baseline.png` | Commercial options comparison |
+| `03_explanation_warnings.png` | Decision reasons + CASH_SHORTFALL warning |
+| `04a_scenario_patch_applied.png` | Strong patch applied (company / work_items / people) |
+| `04b_after_patch_run.png` | Re-run after patch (Objective changed to 23986700.0) |
+| `04c_restore_initial.png` | Restore initial scenario confirmation |
+| `05_strict_cash_infeasible.png` | Strict-cash mode → INFEASIBLE |
 
-Optional demo video: maximum five minutes.
+
+Screenshots are located in `submit_screen/ScreenShot/`.
+
+### 01. Decision baseline
+![Decision baseline](submit_screen/ScreenShot/01_decision_baseline.png)
+
+### 02. Sales baseline
+![Sales baseline](submit_screen/ScreenShot/02_sales_baseline.png)
+
+### 03. Explanation & Warnings
+![Explanation and warnings](submit_screen/ScreenShot/03_explanation_warnings.png)
+
+### 04a. Scenario patch applied
+![Scenario patch applied](submit_screen/ScreenShot/04a_scenario_patch_applied.png)
+
+### 04b. After patch run
+![After patch run](submit_screen/ScreenShot/04b_after_patch_run.png)
+
+### 04c. Restore initial scenario
+![Restore initial](submit_screen/ScreenShot/04c_restore_initial.png)
+
+### 05. Strict-cash infeasible
+![Strict cash infeasible](submit_screen/ScreenShot/05_strict_cash_infeasible.png)

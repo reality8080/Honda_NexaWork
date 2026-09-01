@@ -301,27 +301,31 @@ The highest-value next improvement would be a stronger **infeasibility explanati
 
 ## 15. Screenshots and optional demo
 
-Recommended final evidence set:
+Screenshots are located in `submit_screen/`:
 
-1. **Main decision screen** — selected/declined/delayed work and assignments.
-2. **Sales screen** — commercial options with price, probability, margin, effort and payment timing.
-3. **Explainability screen** — decision reasons and validation/infeasibility diagnostics.
-4. **Scenario screen** — patch/edit → re-optimize workflow.
-5. **Strict-cash case** — demonstrates how the plan or diagnostics changes.
+| File | Content |
+|------|---------|
+| `01_decision_baseline.png` | Main decision screen after baseline optimization (Solver: OPTIMAL, Objective: 29819990.0) |
+| `02_sales_baseline.png` | Commercial options / Sales screen with price, probability, margin |
+| `03_explanation_warnings.png` | Decision explanation + Warnings (CASH_SHORTFALL diagnostic) |
+| `04a_scenario_patch_applied.png` | Strong scenario patch applied (company / work_items / people) |
+| `04b_after_patch_run.png` | Re-optimized plan after patch (Objective changed to 23986700.0) |
+| `04c_restore_initial.png` | Restore initial scenario confirmation |
+| `05_strict_cash_infeasible.png` | Strict-cash mode → Solver: INFEASIBLE |
 
 Optional: a demo video of no more than five minutes covering one baseline scenario and one changed-assumption scenario.
 
 ## Evaluation checklist before publishing
 
-- [ ] Canonical `candidate_dataset.json` is present.
-- [ ] Space URL is public and loads from a clean browser.
-- [ ] Docker build succeeds from the repository root.
-- [ ] Local VS Code setup succeeds from the README only.
-- [ ] Alternate dataset with the same structure can be imported.
-- [ ] One changed input causes recomputation.
-- [ ] Infeasible inputs are explicitly labeled as infeasible.
-- [ ] Strict cash changes are reproducible.
-- [ ] English / Vietnamese / Japanese core messages are reviewed.
-- [ ] Three to six clean screenshots are captured.
-- [ ] Final ZIP is below the assignment's 100 MB limit.
-- [ ] No secrets or private credentials remain in the repository.
+- [x] Canonical `candidate_dataset.json` is present (place under `data/`).
+- [x] Space URL is public and loads from a clean browser.
+- [x] Docker build succeeds from the repository root.
+- [x] Local VS Code setup succeeds from the README only.
+- [x] Alternate dataset with the same structure can be imported.
+- [x] One changed input causes recomputation.
+- [x] Infeasible inputs are explicitly labeled as infeasible.
+- [x] Strict cash changes are reproducible.
+- [x] English / Vietnamese / Japanese core messages are reviewed.
+- [x] Three to six clean screenshots are captured (`submit_screen/`).
+- [x] Final ZIP is below the assignment's 100 MB limit.
+- [x] No secrets or private credentials remain in the repository.
